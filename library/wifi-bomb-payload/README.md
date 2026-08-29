@@ -10,7 +10,7 @@ The script creates randomized SSIDs and locally administered MAC addresses, then
 
 ## Features
 
-- broadcasts up to 1000 fake APs in a loop
+- broadcasts up to (depends on system performance) fake APs in a loop
 - generates a unique SSID for each beacon frame
 - creates randomized BSSID-like MAC addresses
 - uses raw packet injection with Scapy
