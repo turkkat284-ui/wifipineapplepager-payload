@@ -11,6 +11,30 @@ DEFAULT_IFACE = os.environ.get("WIFI_BOMB_IFACE", "wlan0mon")
 DEFAULT_TOTAL = int(os.environ.get("WIFI_BOMB_TOTAL", "1000"))
 DEFAULT_INTERVAL = float(os.environ.get("WIFI_BOMB_INTERVAL", "0.005"))
 
+# Sadece İngilizce komik SSID listesi
+FUNNY_SSIDS = [
+    "Searching...",
+    "Loading_WiFi_99%",
+    "Get_Your_Own_WiFi",
+    "Connecting_to_FBI_van...",
+    "Virus_Infected_AP",
+    "Router_Not_Found",
+    "Password_is_12345678",
+    "Click_Here_For_Free_RAM",
+    "Tell_My_WiFi_Love_Her",
+    "No_Free_WiFi_Here",
+    "Win_XP_Error_404",
+    "Searching_for_signal...",
+    "cheeky-breeky-iv-WANkey",
+    "what_are_you_looking",
+    "english_or_spanish",
+    "english_or_english",
+    "kim_jong_WAN",
+    "FBI_network",
+    "buy_you_own_rounter_you_thief",
+    "gameover_zeus_network"
+]
+
 
 def iface_exists(iface: str) -> bool:
     try:
@@ -64,7 +88,8 @@ def main():
     try:
         while True:
             for i in range(total):
-                ssid = f"FAKE_AP_{i}"
+                # Sırayla listedeki komik isimleri döner
+                ssid = FUNNY_SSIDS[i % len(FUNNY_SSIDS)]
                 mac = random_mac()
                 pkt = make_beacon(ssid, mac)
 
