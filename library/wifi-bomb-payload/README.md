@@ -67,7 +67,6 @@ The script uses this configuration by default:
 
 ```python
 IFACE = "wlan0mon"
-TOTAL_DEVICES = 1000
 ```
 
 To adjust behavior, edit the values in [core/core.py](core/core.py).
