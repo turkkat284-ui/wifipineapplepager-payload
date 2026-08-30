@@ -1,110 +1,66 @@
 # Wi‑Fi Beacon Bomb
 
-A lightweight Python tool that continuously broadcasts fake 802.11 beacon frames to simulate multiple access points. It is built for wireless testing, lab environments, and educational exploration using Scapy.
+A lightweight Python payload that broadcasts fake 802.11 beacon frames to simulate multiple access points. This README is synchronized with the code in `src/` and `core/` (payload script and Ducky payload), and documents only the files shipped in this payload directory.
 
-> Warning: This project is intended only for authorized, lawful testing in environments where you have explicit permission to assess wireless behavior.
+> Warning: Use only in controlled environments where you have explicit permission to perform wireless testing.
 
-## What this project does
+## What is included
 
-The script creates randomized SSIDs and locally administered MAC addresses, then injects beacon frames onto a selected wireless interface. This can be useful in controlled network research, Wi‑Fi lab setups, and defensive testing scenarios.
-
-## Features
-
-- broadcasts up to (depends on system performance) fake APs in a loop
-- generates a unique SSID for each beacon frame
-- creates randomized BSSID-like MAC addresses
-- uses raw packet injection with Scapy
-- supports quick deployment from a Linux-based wireless adapter
-
-## Repository structure
-
-```text
-wifi-bomb/
-├── core/
-│   └── core.py
-├── src/
-│   └── payload.txt
-├── CONTRIBUTING.md
-├── LICENSE
-├── README.md
-└── .gitignore
-```
+- core/core.py — Python 3 script that generates and injects beacon frames using Scapy.
+- src/payload.txt — DuckyScript-style payload that prepares the environment, enables monitor mode, and launches the Python script in the background.
 
 ## Requirements
 
 - Python 3
-- Scapy
-- a wireless interface capable of monitor mode
-- Linux-based environment for packet injection
+- Scapy (`python3 -m pip install scapy`)
+- A wireless adapter that supports monitor mode and packet injection
+- Linux-based environment for running packet injection tools (e.g., airmon-ng)
 
-Install dependencies:
+## Quick start
 
-```bash
-python3 -m pip install scapy
-```
+1. Put your wireless interface into monitor mode (the included Ducky payload attempts to do this automatically via airmon-ng):
 
-## Setup
+   ```bash
+   sudo airmon-ng start wlan0
+   ```
 
-Before running the tool, make sure the interface is available and in monitor mode.
+2. Run the Python script directly:
 
-Example:
+   ```bash
+   python3 core/core.py
+   ```
 
-```bash
-sudo airmon-ng start wlan0
-```
+   By default the script uses the `WIFI_BOMB_IFACE` environment variable or `wlan0mon` if not set.
 
-Then confirm the monitor interface name, such as `wlan0mon`.
+3. To run without transmitting packets (simulation mode):
 
-## Usage
+   ```bash
+   python3 core/core.py --simulate --verbose
+   ```
 
-Run the script directly:
+4. The DuckyScript payload (`src/payload.txt`) will attempt to install pip/scapy, enable monitor mode, and start the script in the background:
 
-```bash
-python3 core/core.py
-```
+   - It sets `WIFI_BOMB_IFACE` to the monitor interface and launches: `env WIFI_BOMB_IFACE=wlan0mon python3 core/core.py`
 
-The script uses this configuration by default:
+## Configuration
 
-```python
-IFACE = "wlan0mon"
-```
+- Interface: change the default monitor interface by setting the `WIFI_BOMB_IFACE` environment variable or passing `--iface` to `core.py`.
+- Total fake APs per cycle: `--total` (default from code: 1000 or from env `WIFI_BOMB_TOTAL`).
+- Packet interval: `--interval` seconds between packets (default 0.005 or from env `WIFI_BOMB_INTERVAL`).
+- Simulate: `--simulate` to run in non-transmitting mode for testing.
+- Verbose: `--verbose` for per-packet logging to stdout.
 
-To adjust behavior, edit the values in [core/core.py](core/core.py).
+## How it works (implementation notes)
 
-### Stop the script
-
-Press `Ctrl + C` in the terminal to stop the broadcast loop.
-
-## How it works
-
-The script:
-
-1. selects a wireless interface
-2. creates fake SSIDs like `FAKE_AP_0`, `FAKE_AP_1`, and so on
-3. generates random MAC addresses
-4. builds 802.11 beacon packets with Scapy
-5. injects them continuously using `sendp()`
-
-This approach is intentionally simple and readable for educational use.
-
-## Ducky payload
-
-The repository also includes a payload file in [src/payload.txt](src/payload.txt) that automates the setup and starts the Python script in the background.
+- The script builds 802.11 beacon frames with Scapy (RadioTap/Dot11/Dot11Beacon/Dot11Elt).
+- It generates locally administered MAC addresses and cycles through a small SSID list included in `core/core.py`.
+- Packets are sent via `sendp(pkt, iface=iface, count=1)` in a tight loop.
+- A KeyboardInterrupt (Ctrl+C) stops the loop and exits cleanly.
 
 ## Safety and ethics
 
-Use this project only in environments you own, manage, or are explicitly authorized to test. Do not target third-party networks, production infrastructure, or public Wi‑Fi environments without permission.
-
-The code is provided for learning, defensive testing, and authorized research only.
-
-## Contributing
-
-Contributions are welcome if they improve documentation, compatibility, safety, or maintainability. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+Use this only on equipment and networks you own or are authorized to test. Broadcasting many fake APs can disrupt nearby Wi‑Fi clients and infrastructure.
 
 ## License
 
-This project is distributed under the terms of the repository license. See [LICENSE](LICENSE) for details.
-
-## Disclaimer
-
-The author assumes no responsibility for misuse of this software. This project is not intended to facilitate unauthorized interference with wireless networks.
+See the repository LICENSE file.
