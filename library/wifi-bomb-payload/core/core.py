@@ -2,10 +2,12 @@ import random as rand
 from scapy.all import RadioTap, Dot11, Dot11Beacon, Dot11Elt, sendp  # type: ignore
 
 IFACE = "wlan0mon"
+count = 0
 
 while True:
     # step 1: Create the packets
-    ssid = f"FAKE_AP_{i}"
+    count += 1
+    ssid = f"FAKE_AP_{count}"
     mac = f"02:00:00:{rand.randint(0, 255):02x}:{rand.randint(0, 255):02x}:{rand.randint(0, 255):02x}"  # type: ignore
 
     pkt = (
