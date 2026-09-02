@@ -1,219 +1,44 @@
-# Payload Library for the [WiFi Pineapple Pager](https://hak5.org/products/wifi-pineapple-pager) by [Hak5](https://hak5.org)
+# WiFi Pineapple Pager Payload Library
 
-> **Note:** This repository is under construction and actively maintained.
+Officially forked collection of community-developed payloads for the WiFi Pineapple Pager.
 
-This repository contains **community-developed payloads** for the Hak5 WiFi Pineapple Pager. Community developed payloads are listed and developers are encouraged to create pull requests to make contributions.
+> Note: This repository is community-maintained and may contain payloads that require review before use.
 
-**Payloads here are written in official DuckyScript™ + Bash specifically for the WiFi Pineapple Pager. Hak5 does NOT guarantee payload functionality.** <a href="#legal"><b>See Legal and Disclaimers below.</b></a>
+## About
 
+This repository collects payloads (DuckyScript and Bash) and helper scripts intended to run on the Hak5 WiFi Pineapple Pager. Payloads are contributed by the community — authors are responsible for their content and functionality.
 
+## Library layout
 
-<div align="center">
-<img src="https://img.shields.io/github/forks/hak5/wifipineapplepager-payloads?style=for-the-badge"/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="https://img.shields.io/github/stars/hak5/wifipineapplepager-payloads?style=for-the-badge"/>
-<br/>
-<img src="https://img.shields.io/github/commit-activity/y/hak5/wifipineapplepager-payloads?style=for-the-badge">
-<img src="https://img.shields.io/github/contributors/hak5/wifipineapplepager-payloads?style=for-the-badge">
-</div>
-<br/>
-<p align="center">
-<br/>
-<a href="https://hak5.org/blogs/payloads/tagged/wifi-pineapple-pager">View Featured Pager Payloads and Leaderboard</a>
-<br/><i>Get your payload in front of thousands. Enter to win over $2,000 in prizes in the <a href="https://hak5.org/pages/payload-awards">Hak5 Payload Awards!</a></i>
-</p>
-
-
-<div align="center">
-<a href="https://hak5.org/discord"><img src="https://img.shields.io/discord/506629366659153951?label=Hak5%20Discord&style=for-the-badge"></a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://youtube.com/hak5"><img src="https://img.shields.io/youtube/channel/views/UC3s0BtrBJpwNDaflRSoiieQ?label=YouTube%20Views&style=for-the-badge"/></a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://youtube.com/hak5"><img src="https://img.shields.io/youtube/channel/subscribers/UC3s0BtrBJpwNDaflRSoiieQ?style=for-the-badge"/></a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://twitter.com/hak5"><img src="https://img.shields.io/badge/follow-%40hak5-1DA1F2?logo=twitter&style=for-the-badge"/></a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://instagram.com/hak5gear"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white"/></a>
-<br/><br/>
-
-</div>
-
-# Table of contents
-<details open>
-<ul>
-<li><a href="#about-the-new-wifi-pineapple-pager">About the WiFi Pineapple Pager</a></li>
-<li><a href="#payload-library-overview">Payload Library Overview</a></li>
-<li><b><a href="#contributing">Contributing Payloads</a></b></li>
-<li><a href="#legal"><b>Legal and Disclaimers</b></a></li>
-</ul> 
-</details>
-
-
-## Shop
-- [WiFi Pineapple Pager](https://hak5.org/products/wifi-pineapple-pager "Purchase the NEW WiFi Pineapple Pager")
-- [PayloadStudio Pro](https://hak5.org/products/payload-studio-pro "Purchase PayloadStudio Pro")
-- [Shop All Hak5 Tools](https://shop.hak5.org "Shop All Hak5 Tools")
-
-## Documentation / Learn More
--   [Documentation](https://docs.hak5.org/ "Documentation")
--   [DuckyScript Reference](https://docs.hak5.org/hc/en-us/articles/16949632408340-DuckyScript-3-0-Command-Reference)
-
-## Community
-*Got Questions? Need some help? Reach out:*
--  [Discord](https://hak5.org/discord/ "Discord")
--  [Forums](https://forums.hak5.org/ "Hak5 Forums")
-
-
-## Additional Links
-<b> Follow the creators </b><br/>
-<p >
-	<a href="https://twitter.com/notkorben">Korben's Twitter</a> | 
-	<a href="https://instagram.com/hak5korben">Korben's Instagram</a>
-<br/>
-	<a href="https://infosec.exchange/@kismetwireless">Dragorn's Mastodon</a> | 
-<br/>
-	<a href="https://twitter.com/hak5darren">Darren's Twitter</a> | 
-	<a href="https://instagram.com/hak5darren">Darren's Instagram</a>
-</p>
-
-<br/>
-<h1><a href="https://hak5.org/products/wifi-pineapple-pager">About the NEW WiFi Pineapple Pager</a></h1>
-
-A WiFi Pineapple built for Hackers who don't stay put.
-
-
-<p align="center">
-<a href="https://youtu.be/GUaUerYCvs0"><img src="https://cdn.shopify.com/s/files/1/0068/2142/files/pager-transparent.png?v=1765835552"/></a>
-<br/>
-<i>New WiFi Pineapple Pager</i>
-</p>
-
-The first Payload-powered WiFi Pineapple is here — and it runs DuckyScript™, Hak5's simple and powerful scripting language. Paired with Bash and backed by Linux, it brings serious scripting capabilities to your operations. Launch targeted attacks or set alert payloads to fire off based on live WiFi activity. Ringtones, vibes and visuals.
-
-Take control of the airspace with the 8th generation PineAP engine — now over 100× faster. Rebuilt from the kernel up, this attack suite is hyper optimized for advanced WiFi operations.
-
-Run Rogue AP, Man-in-the-Middle, and Deauth attacks. Nab handshakes, OSINT and more, all from a live dashboard.
-
-# Payload Library Overview
-
-The `library/` directory contains organized payload collections:
-
-- **`library/wifi-bomb-payload/`** - WiFi beacon bombing and AP simulation payloads. Contains the Wi-Fi Beacon Bomb payload that creates 1000+ fake access points for network testing and reconnaissance.
-- **`library/user/`** - User-contributed payloads including Evil Portal implementations and custom network attacks
-- **`library/alerts/`** - Alert-based payloads triggered by WiFi events (handshake captures, device detections, etc.)
+- library/
+  - user/      — User-contributed payloads
+  - alerts/    — Alert-based payloads (handshake, device detected, etc.)
+  - wifi-bomb-payload/ — Beacon-bombing and AP-simulation payloads
 
 Each payload directory should include:
-- `payload.sh` or `payload.txt` - The main payload script
-- `README.md` - Documentation with usage instructions
-- Supporting files (scripts, templates, data files as needed)
+- `payload.sh` or `payload.txt` — main payload script
+- `README.md` — usage and configuration instructions
+- any supporting files required to run the payload
 
-# About DuckyScript™
+## Payload format and guidelines
 
-DuckyScript is the payload language of Hak5 gear.
+- DuckyScript payload files: `payload.txt`
+- Bash payload files: `payload.sh` (include a `#!/bin/bash` header)
+- Include metadata at the top of each payload (Title, Description, Author, Version, Category)
+- Use placeholders for secrets (URLs, API keys, credentials) — do not include private data
+- Do not rely on this repository as a CDN for staged payloads. Provide instructions for hosting staged files separately.
 
-Originating on the Hak5 USB Rubber Ducky as a standalone language, the WiFi Pineapple Pager uses DuckyScript commands to bring the ethos of easy-to-use actions to the payload language.
-
-DuckyScript commands are always in all capital letters to distinguish them from other system or script language commands. Typically, they take a small number of options (or sometimes no options).
-
-Payloads can be constructed of DuckyScript commands alone, or combined with the power of bash scripting and system commands to create fully custom, advanced actions.
-
-The files in this repository are _the source code_ for your payloads and run _directly on the device_ **no compilation required** - simply place your `payload.sh` in the appropriate directory and the Pager will recognize and execute it.
-
-<h1><a href="https://payloadstudio.hak5.org">Build your payloads with PayloadStudio</a></h1>
-<p align="center">
-Take your DuckyScript™ payloads to the next level with this full-featured,<b> web-based (entirely client side) </b> development environment.
-<br/>
-<a href="https://payloadstudio.hak5.org"><img src="https://cdn.shopify.com/s/files/1/0068/2142/products/payload-studio-icon_180x.png?v=1659135374"></a>
-<br/>
-<i>Payload studio features all of the conveniences of a modern IDE, right from your browser. From syntax highlighting and auto-completion to live error-checking and repo synchronization.</i>
-<br/><br/>
-Supports your favorite Hak5 gear - USB Rubber Ducky, Bash Bunny, Key Croc, Shark Jack, Packet Squirrel & LAN Turtle!
-<br/><br/></i><br/>
-<a href="https://hak5.org/products/payload-studio-pro">Become a PayloadStudio Pro</a> and <b> Unleash your hacking creativity! </b>
-<br/>
-OR
-<br/>
-<a href="https://payloadstudio.hak5.org/community/"> Try Community Edition FREE</a> 
-<br/><br/>
-<img src="https://cdn.shopify.com/s/files/1/0068/2142/files/themes1_1_600x.gif?v=1659642557">
-<br/>
-<i> Payload Studio Themes Preview GIF </i>
-<br/><br/>
-<img src="https://cdn.shopify.com/s/files/1/0068/2142/files/AUTOCOMPLETE3_600x.gif?v=1659640513">
-<br/>
-<i> Payload Studio Autocomplete Preview GIF </i>
-</p>
-
-<h1><a href='https://payloadhub.com'>Contributing</a></h1>
-
-<p align="center">
-<a href="https://payloadhub.com"><img src="https://cdn.shopify.com/s/files/1/0068/2142/files/payloadhub.png?v=1652474600"></a>
-<br/>
-<a href="https://payloadhub.com">View Featured Payloads and Leaderboard </a>
-</p>
-
-# Please adhere to the following best practices and style guides when submitting a payload.
-
-Once you have developed your payload, you are encouraged to contribute to this repository by submitting a Pull Request. Reviewed and Approved pull requests will add your payload to this repository.
-
-Please include all resources required for the payload to run. If needed, provide a README.md in the root of your payload's directory to explain things such as intended use, required configuration, and any dependencies.
-
-
-### Purely Destructive payloads will not be accepted. No, it's not "just a prank".
-Subject to change. Please ensure any submissions meet the [latest version](https://github.com/hak5/wifipineapple-pager/blob/master/README.md) of these standards before submitting a Pull Request.
-
-
-## Naming Conventions
-
-Please give your payload a unique, descriptive and appropriate name. Do not use spaces in payload, directory or file names. Each payload should be submitted into its own directory, with `-` or `_` used as delimiters.
-
-The payload itself should be named `payload.sh` (for bash payloads) or `payload.txt` (for DuckyScript payloads).
-
-## Payload Configuration
-
-In many cases, payloads will require some level of configuration by the end payload user. Be sure to take the following into careful consideration to ensure your payload is easily tested, used and maintained.
-
-- Remember to use PLACEHOLDERS for configurable portions of your payload - do not share your personal URLs, API keys, Passphrases, etc...
-- Do not leave defaults that point at live services
-- Make note of both required and optional configuration(s) in your payload using comments at the top of your payload or "inline" where applicable
-
-## Payload Format
-
-Payloads should begin with comments specifying at the very least the name of the payload and author. Additional information such as a brief description, the target, any dependencies / prerequisites should also be included at the top of the file.
-
-Example format for DuckyScript payloads:
+Example DuckyScript header:
 
 ```
 # Title: Example payload
-# Description: Example payload with configuration options
-# Author: Hak5
+# Description: Short description
+# Author: Your Name
 # Version: 1.0
-# Category: Remote-Access
-# Net Mode: NAT
-#
-# LED State Descriptions
-# Magenta Solid - Configuring NETMODE
-# LED OFF - Waiting for BUTTON
-# Red Blink 2 Times - Connection Failed
-# Amber Blink 5 Times - Connection Successful
-# Red Blink 1 Time - Command Failed
-# Cyan Blink 1 Time - Command Successful
+# Category: Example
 ```
 
-### Configuration Options
-
-Configurable options should be specified in variables at the top of the payload file:
-
-```
-# Options
-SSH_USER="username"
-SSH_HOST="hostname"
-PORT=31337
-```
-
-## Bash Payloads
-
-Bash payloads are powerful scripts that can leverage the full Linux environment of the Pager. They should follow standard bash scripting practices:
+Example bash header:
 
 ```bash
 #!/bin/bash
@@ -221,67 +46,27 @@ Bash payloads are powerful scripts that can leverage the full Linux environment 
 # Description: Demonstrates bash payload structure
 # Author: Your Name
 # Version: 1.0
-
-# Configuration
-TARGET_HOST="${1:-example.com}"
-TIMEOUT=30
-
-# Functions
-log_message() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
-}
-
-# Main
-log_message "Starting payload execution..."
-# Your payload logic here
-log_message "Payload complete"
 ```
 
-## Staged Payloads
+## Contributing
 
-"Staged payloads" are payloads that **download** code from some resource external to the payload file.
+Contributions are welcome via pull requests. When submitting a payload:
+- Put each payload in its own directory with a clear name (use `-` or `_`, avoid spaces)
+- Include a README.md describing usage, configuration, and dependencies
+- Ensure payloads are non-destructive and intended only for authorized testing
 
-While staging code used in payloads is often useful and appropriate, using this (or another) github repository as the means of deploying those stages is not. This repository is **not a CDN for deployed payloads**.
+## Legal and Disclaimer
 
-Staged code should be copied to and hosted on an appropriate server for doing so **by the end user** - Github and this repository are simply resources for sharing code among developers and users.
+These payloads are provided for educational and authorized security testing purposes only. Users must ensure compliance with all local laws and obtain explicit permission before testing networks or devices.
 
-See: [GitHub acceptable use policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies#5-site-access-and-safety)
+The authors and repository maintainers are not responsible for misuse.
 
-Additionally, any source code that is intended to be staged **(by the end user on the appropriate infrastructure)** should be included in any payload submissions either in the comments of the payload file or as separate files in the payload directory.
+## License
 
-### Including URLs
+See LICENSE file in the repository (or include a license in your pull request). If no license is present, treat the content as "all rights reserved" by the original author.
 
-URLs used for retrieving staged code should refer exclusively to **example.com** using DEFINE in any payload submissions.
+## Contact / Resources
 
-### Staged Example
+- WiFi Pineapple Docs: https://docs.hak5.org/
+- DuckyScript reference: https://docs.hak5.org/hc/en-us/articles/16949632408340-DuckyScript-3-0-Command-Reference
 
-**Example scenario: your payload downloads a script and then executes it on a target machine.**
-- Include the script in the directory with your payload
-- Provide instructions for the user to move the script to the appropriate hosting service.
-- Provide a DEFINE with the placeholder example.com for the user to easily configure once they have hosted the script
-
-
-
-<h1><a href="https://hak5.org/pages/policy">Legal</a></h1>
-
-Payloads from this repository are provided for educational purposes only. Hak5 gear is intended for authorized auditing and security analysis purposes only where permitted subject to local and international laws.
-
-WiFi Pineapple and DuckyScript are the trademarks of Hak5 LLC. Copyright © 2010 Hak5 LLC. All rights reserved. No part of this work may be reproduced or transmitted in any form or by any means without the prior written permission of Hak5 LLC.
-
-WiFi Pineapple and DuckyScript are subject to the Hak5 license agreement (https://hak5.org/license)
-
-DuckyScript is the intellectual property of Hak5 LLC for the sole benefit of Hak5 LLC and its licensees. To inquire about obtaining a license to use this material in your own project, contact us at legal@hak5.org.
-
-This material is for education, authorized auditing and analysis purposes where permitted subject to local and international laws. Users are solely responsible for compliance. Hak5 LLC claims no responsibility for unauthorized or unlawful distribution or use of this material.
-
-Hak5 LLC products and technology are only available to BIS recognized license exception ENC favorable treatment countries pursuant to US 15 CFR Supplement No 3 to Part 740.
-
-See also: 
-
-[Hak5 Software License Agreement](https://shop.hak5.org/pages/software-license-agreement)
-	
-[Terms of Service](https://shop.hak5.org/pages/terms-of-service)
-
-# Disclaimer
-<h3><b>As with any script, you are advised to proceed with caution.</h3></b>
-<h3><b>Generally, payloads may execute commands on your device. As such, it is possible for a payload to damage your device. Payloads from this repository are provided AS-IS without warranty. While we make a good faith effort to ensure all payloads are safe, Hak5 LLC cannot be held responsible for payload behavior or misuse.</b></h3>
