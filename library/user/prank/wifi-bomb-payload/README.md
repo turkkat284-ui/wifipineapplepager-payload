@@ -80,9 +80,17 @@ python3 core/core.py --iface ath0 --total 500
 
 ## How it works (implementation notes)
 
-- The script builds 802.11 beacon frames with Scapy (RadioTap/Dot11/Dot11Beacon/Dot11Elt).
-- It generates locally administered MAC addresses (first byte = `0x02`) and cycles through the SSID list in `core/core.py`.
-- Packets are sent via Scapy's `sendp(pkt, iface=iface, count=1, verbose=False)` in a tight loop.
+- The script builds 802.11 beacon frames with Scapy:
+  - `RadioTap` layer for wireless transmission metadata
+  - `Dot11` layer with broadcast address (addr1=`ff:ff:ff:ff:ff:ff`)
+  - `Dot11Beacon` with capability flags: `ESS+privacy`
+  - `Dot11Elt` elements for SSID, Rates, and DSset (channel info)
+- It generates locally administered MAC addresses with:
+  - First byte: `0x02` (indicates locally administered)
+  - Second byte: `0x00-0x7f` (randomized, limited range)
+  - Remaining 4 bytes: fully randomized
+- SSID selection: **randomly selected** from the SSID list on each beacon frame (not sequential)
+- Packets are sent via Scapy's `sendp(pkt, iface=iface, count=1, verbose=False)` in a tight loop
 - The payload script (`payload.sh`) handles:
   - Wireless interface auto-detection (via `iwconfig`)
   - Package installation and dependency management (apt-get + pip)
@@ -94,7 +102,7 @@ python3 core/core.py --iface ath0 --total 500
 
 ## SSID List
 
-The script cycles through a list of funny/prank SSID names:
+The script randomly selects from a list of 22 funny/prank SSID names (22 total):
 
 ```
 Searching...
@@ -117,13 +125,25 @@ kim_jong_WAN
 FBI_network
 buy_you_own_rounter_you_thief
 gameover_zeus_network
+anakin_skyLANker
+ankara_LANSSI
 ```
+
+## Safety and ethics
+
+Use this only on equipment and networks you own or are authorized to test. Broadcasting many fake APs can:
+- Disrupt nearby Wi‑Fi clients and infrastructure
+- Cause performance degradation on wireless networks
+- Interfere with legitimate Wi‑Fi operations
+- May violate local telecommunications regulations
+
+**The author is not responsible for misuse.**
 
 ## Disclaimer & Usage Notice
 
 > **WARNING:** This tool is designed for educational and authorized testing purposes only.
 
-* **Default Behavior:** The tool ships with safe default operational limits (`MAX_CYCLES = 1000`).
+* **Default Behavior:** The tool ships with safe default operational limits (default: `1000` APs per cycle).
 * **User Responsibility:** Modifying execution parameters, signal power, or cycle limits may result in hardware stress, packet flooding, or module overheating depending on your environment.
 * **Liability:** The author assumes no responsibility for hardware damage or misuse resulting from parameter adjustments.
 
