@@ -4,8 +4,8 @@
 # Title: Wi-Fi Beacon Bomb (1000 Fake APs)
 # Author: turkkat284
 # Description: Sets monitor mode and launches core/core.py for WiFi Pineapple Pager
-# Version: 1.0
-# Category: Passive-Recon
+# Version: 2.0
+# Category: Prank
 # Target: WiFi Pineapple Pager
 # ================================================
 #
@@ -30,13 +30,16 @@
 # CONFIGURATION:
 # Modify these variables to customize the payload behavior
 
+# Detect the payload script directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PAYLOAD_DIR="$(dirname "$SCRIPT_DIR")"  # Parent directory containing core/
+
 # Network Interface Configuration
-IFACE="wlan0"              # Primary wireless interface to use
-MON_IFACE="wlan0mon"       # Monitor mode interface name
-PAYLOAD_DIR="/root/payloads/wifi_bomb"  # Directory containing core/core.py
+IFACE="${WIFI_IFACE:-wlan0}"           # Primary wireless interface (override with env var)
+MON_IFACE="${WIFI_MON_IFACE:-}"        # Monitor mode interface name (auto-detect if empty)
 
 # Logging
-LOG_FILE="/tmp/wifi_bomb.log"
+LOG_FILE="${WIFI_LOG_FILE:-/tmp/wifi_bomb.log}"
 
 # ================================================
 # FUNCTIONS
@@ -52,6 +55,21 @@ log_message() {
 error_exit() {
     log_message "ERROR: $1"
     exit 1
+}
+
+# Auto-detect wireless interfaces
+detect_interface() {
+    log_message "Auto-detecting wireless interface..."
+    
+    # Try to find a wireless interface
+    local iface=$(ip link show | grep -E "^\d+:\s+(wlan|wlo|ath)" | head -1 | awk '{print $2}' | tr -d ':')
+    
+    if [ -z "$iface" ]; then
+        error_exit "No wireless interface found. Available interfaces: $(ip link show | grep -E '^\d+:' | awk '{print $2}' | tr -d ':' | tr '\n' ' ')"
+    fi
+    
+    log_message "Detected wireless interface: $iface"
+    IFACE="$iface"
 }
 
 # Prepare environment with dependencies
@@ -86,28 +104,60 @@ enable_monitor_mode() {
         error_exit "Interface $IFACE not found"
     fi
     
+    # Kill interfering processes
+    log_message "Killing interfering processes..."
+    airmon-ng check kill > /dev/null 2>&1 || true
+    
     # Attempt to enable monitor mode with airmon-ng
     if command -v airmon-ng &> /dev/null; then
         log_message "Using airmon-ng to enable monitor mode..."
-        airmon-ng start "$IFACE" > /dev/null 2>&1
+        local airmon_output=$(airmon-ng start "$IFACE" 2>&1)
+        log_message "airmon-ng output: $airmon_output"
+        
+        # Try to detect the monitor interface created by airmon-ng
+        # It might be wlan0mon, wlan0-mon, or the original interface name
+        sleep 1
+        
+        if [ -z "$MON_IFACE" ]; then
+            # Auto-detect monitor interface
+            MON_IFACE=$(iwconfig 2>/dev/null | grep "Mode:Monitor" | awk '{print $1}' | head -1)
+            
+            if [ -z "$MON_IFACE" ]; then
+                # Fallback: try common naming patterns
+                for candidate in "${IFACE}mon" "${IFACE}-mon" "${IFACE}"; do
+                    if iwconfig "$candidate" 2>/dev/null | grep -q "Mode:Monitor"; then
+                        MON_IFACE="$candidate"
+                        break
+                    fi
+                done
+            fi
+        fi
         
         # Verify monitor mode is active
-        if iwconfig "$MON_IFACE" 2>/dev/null | grep -q "Mode:Monitor"; then
+        if [ -n "$MON_IFACE" ] && iwconfig "$MON_IFACE" 2>/dev/null | grep -q "Mode:Monitor"; then
             log_message "Monitor mode successfully enabled on $MON_IFACE"
         else
-            log_message "Warning: Monitor mode may not be active, attempting manual configuration..."
+            log_message "Warning: Monitor mode may not be active on $MON_IFACE, attempting manual configuration..."
+            # Set MON_IFACE to the original interface as fallback
+            MON_IFACE="${MON_IFACE:-$IFACE}"
         fi
     else
-        log_message "airmon-ng not found, attempting iwconfig..."
+        log_message "airmon-ng not found, attempting manual iwconfig method..."
         ip link set "$IFACE" down
         iwconfig "$IFACE" mode monitor
         ip link set "$IFACE" up
+        MON_IFACE="$IFACE"
         
         if iwconfig "$IFACE" 2>/dev/null | grep -q "Mode:Monitor"; then
-            log_message "Monitor mode successfully enabled via iwconfig"
+            log_message "Monitor mode successfully enabled via iwconfig on $IFACE"
         else
             error_exit "Failed to enable monitor mode"
         fi
+    fi
+    
+    # Final validation
+    if ! iwconfig "$MON_IFACE" 2>/dev/null | grep -q "Mode:Monitor"; then
+        log_message "Warning: Monitor mode validation failed, but continuing anyway..."
     fi
 }
 
@@ -125,11 +175,17 @@ run_core_script() {
         error_exit "Core script not found: $PAYLOAD_DIR/core/core.py"
     fi
     
+    # Verify Python is available
+    if ! command -v python3 &> /dev/null; then
+        error_exit "Python3 is not installed"
+    fi
+    
     # Change to payload directory and launch script in background
     log_message "Changing to $PAYLOAD_DIR and starting core.py..."
     cd "$PAYLOAD_DIR" || error_exit "Cannot change to $PAYLOAD_DIR"
     
     # Launch with environment variable for monitor interface
+    log_message "Launching: env WIFI_BOMB_IFACE='$MON_IFACE' python3 core/core.py"
     nohup env WIFI_BOMB_IFACE="$MON_IFACE" python3 core/core.py > "$LOG_FILE" 2>&1 &
     local pid=$!
     
@@ -152,6 +208,15 @@ main() {
     log_message "WiFi Beacon Bomb Payload - WiFi Pineapple Pager"
     log_message "================================================"
     log_message "Starting payload execution..."
+    log_message "Payload directory: $PAYLOAD_DIR"
+    log_message "Log file: $LOG_FILE"
+    
+    # Auto-detect interface if needed
+    if [ -z "$IFACE" ] || [ "$IFACE" = "wlan0" ]; then
+        if ! ip link show wlan0 > /dev/null 2>&1; then
+            detect_interface
+        fi
+    fi
     
     # Execute setup phases
     prepare_environment || error_exit "Environment preparation failed"
@@ -171,6 +236,7 @@ main() {
     log_message "Monitor interface: $MON_IFACE"
     log_message "Payload directory: $PAYLOAD_DIR"
     log_message "Log file: $LOG_FILE"
+    log_message "Run 'tail -f $LOG_FILE' to monitor execution"
     log_message "================================================"
     
     cleanup
@@ -179,4 +245,3 @@ main() {
 
 # Execute main function
 main "$@"
-
