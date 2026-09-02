@@ -21,9 +21,11 @@ A lightweight Python payload that broadcasts fake 802.11 beacon frames to simula
 
 ### Direct execution
 
-Run the payload (in the src directory)
+Run the setup script from the `src` directory:
 
-and tadaaa !!!
+```bash
+bash payload.sh
+```
 
 It will:
 - Install Python dependencies (pip, Scapy)
@@ -40,47 +42,54 @@ It will:
 
 ## Configuration
 
-### Environment variables
+### Environment variables (payload.sh & core.py)
 
-- `WIFI_BOMB_IFACE` — Monitor mode interface name (default: `wlan0mon`)
+- `WIFI_IFACE` — Primary wireless interface (default: `wlan0`)
+- `WIFI_MON_IFACE` — Explicit monitor mode interface override (optional; auto-detected if empty)
+- `WIFI_BOMB_IFACE` — Monitor mode interface name for core script (default: `wlan0mon`)
 - `WIFI_BOMB_TOTAL` — Number of fake APs per cycle (default: `1000`)
 - `WIFI_BOMB_INTERVAL` — Seconds between packets (default: `0.005`)
-- `WIFI_IFACE` — Primary wireless interface for setup script (default: `wlan0`)
-- `WIFI_MON_IFACE` — Explicit monitor mode interface override (optional)
 - `WIFI_LOG_FILE` — Log file path (default: `/tmp/wifi_bomb.log`)
 
 ### Command-line arguments (core.py)
 
-- `--iface` — Monitor mode interface to use
-- `--total` — Number of fake APs per cycle
-- `--interval` — Seconds between packets
-- `--simulate` — Run in non-transmitting simulation mode
+- `--iface` — Monitor mode interface to use (env: `WIFI_BOMB_IFACE`)
+- `--total` — Number of fake APs per cycle (env: `WIFI_BOMB_TOTAL`)
+- `--interval` — Seconds between packets (env: `WIFI_BOMB_INTERVAL`)
+- `--simulate` — Simulate only; do not transmit packets
 - `--verbose` — Print per-packet info to stdout
 
 ### Example configurations
 
 ```bash
-# Transmit 2000 fake APs with 10ms interval on wlan0mon
+# Use payload script (recommended setup):
+bash payload.sh
+
+# Override interface and total APs:
+env WIFI_IFACE=wlan1 WIFI_BOMB_TOTAL=2000 bash payload.sh
+
+# Direct core.py execution with 2000 fake APs and 10ms interval:
 env WIFI_BOMB_IFACE=wlan0mon WIFI_BOMB_TOTAL=2000 WIFI_BOMB_INTERVAL=0.01 python3 core/core.py
 
-# Simulate without transmitting, with verbose output
+# Simulate without transmitting, with verbose output:
 python3 core/core.py --simulate --verbose
 
-# Use custom interface
+# Use custom interface:
 python3 core/core.py --iface ath0 --total 500
 ```
 
 ## How it works (implementation notes)
 
 - The script builds 802.11 beacon frames with Scapy (RadioTap/Dot11/Dot11Beacon/Dot11Elt).
-- It generates locally administered MAC addresses (first byte = 0x02) and cycles through the SSID list in `core/core.py`.
-- Packets are sent via Scapy's `sendp(pkt, iface=iface, count=1)` in a tight loop.
+- It generates locally administered MAC addresses (first byte = `0x02`) and cycles through the SSID list in `core/core.py`.
+- Packets are sent via Scapy's `sendp(pkt, iface=iface, count=1, verbose=False)` in a tight loop.
 - The payload script (`payload.sh`) handles:
-  - Wireless interface auto-detection
-  - Package installation and dependency management
-  - Monitor mode activation via airmon-ng or iwconfig
-  - Background process management with nohup
-  - Comprehensive logging and error handling
+  - Wireless interface auto-detection (via `iwconfig`)
+  - Package installation and dependency management (apt-get + pip)
+  - Monitor mode activation via airmon-ng (with fallback to iwconfig)
+  - Background process management with `nohup`
+  - Comprehensive logging to `/tmp/wifi_bomb.log` and stdout
+  - Error handling with graceful degradation
 - A KeyboardInterrupt (Ctrl+C) stops the loop and exits cleanly.
 
 ## SSID List
@@ -126,6 +135,15 @@ Use this only on equipment and networks you own or are authorized to test. Broad
 - Verify monitor mode is active: `iwconfig | grep Monitor`
 - Check adapter supports packet injection: `aireplay-ng -9 your_interface`
 - Try simulation mode first: `python3 core/core.py --simulate --verbose`
+- Check logs: `tail -f /tmp/wifi_bomb.log`
+
+### Monitor mode activation fails
+- Ensure aircrack-ng suite is installed: `apt-get install aircrack-ng`
+- Try manual setup: `sudo airmon-ng check kill && sudo airmon-ng start wlan0`
+
+### Python/Scapy issues
+- Verify Scapy is installed: `python3 -m pip list | grep scapy`
+- Reinstall if needed: `python3 -m pip install --upgrade scapy`
 
 ## License
 
