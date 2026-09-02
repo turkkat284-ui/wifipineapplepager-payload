@@ -119,15 +119,13 @@ buy_you_own_rounter_you_thief
 gameover_zeus_network
 ```
 
-## Safety and ethics
+## Disclaimer & Usage Notice
 
-Use this only on equipment and networks you own or are authorized to test. Broadcasting many fake APs can:
-- Disrupt nearby Wi‑Fi clients and infrastructure
-- Cause performance degradation on wireless networks
-- Interfere with legitimate Wi‑Fi operations
-- May violate local telecommunications regulations
+> **WARNING:** This tool is designed for educational and authorized testing purposes only.
 
-**The author is not responsible for misuse.**
+* **Default Behavior:** The tool ships with safe default operational limits (`MAX_CYCLES = 1000`).
+* **User Responsibility:** Modifying execution parameters, signal power, or cycle limits may result in hardware stress, packet flooding, or module overheating depending on your environment.
+* **Liability:** The author assumes no responsibility for hardware damage or misuse resulting from parameter adjustments.
 
 ## Troubleshooting
 
