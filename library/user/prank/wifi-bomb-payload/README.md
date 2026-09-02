@@ -21,33 +21,9 @@ A lightweight Python payload that broadcasts fake 802.11 beacon frames to simula
 
 ### Direct execution
 
-1. Put your wireless interface into monitor mode:
+Run the payload (in the src directory)
 
-   ```bash
-   sudo airmon-ng start wlan0
-   ```
-
-2. Run the Python script directly:
-
-   ```bash
-   python3 core/core.py
-   ```
-
-   By default the script uses the `WIFI_BOMB_IFACE` environment variable or `wlan0mon` if not set.
-
-3. To run without transmitting packets (simulation mode):
-
-   ```bash
-   python3 core/core.py --simulate --verbose
-   ```
-
-### Using the Bash payload script
-
-The Bash payload script (`src/payload.sh`) automates the entire setup process:
-
-```bash
-bash src/payload.sh
-```
+and tadaaa !!!
 
 It will:
 - Install Python dependencies (pip, Scapy)
@@ -109,7 +85,7 @@ python3 core/core.py --iface ath0 --total 500
 
 ## SSID List
 
-The script cycles through a list of funny/prank SSID names (all in English):
+The script cycles through a list of funny/prank SSID names:
 
 ```
 Searching...
@@ -145,19 +121,6 @@ Use this only on equipment and networks you own or are authorized to test. Broad
 **The author is not responsible for misuse.**
 
 ## Troubleshooting
-
-### Monitor mode not activating
-- Check if `airmon-ng` is installed: `apt-get install aircrack-ng`
-- Verify wireless adapter supports monitor mode: `iwconfig`
-- Try manual setup: `sudo ip link set wlan0 down && sudo iwconfig wlan0 mode monitor && sudo ip link set wlan0 up`
-
-### Permission denied errors
-- Ensure you're running with `sudo` for monitor mode and packet injection
-- The setup script will attempt to install dependencies; provide password if prompted
-
-### Interface not found
-- List available interfaces: `ip link show` or `iwconfig`
-- Manually set the interface: `export WIFI_BOMB_IFACE=your_interface`
 
 ### No packets being transmitted
 - Verify monitor mode is active: `iwconfig | grep Monitor`
